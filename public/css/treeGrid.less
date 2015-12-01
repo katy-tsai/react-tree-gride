@@ -1,0 +1,98 @@
+
+@border-color:grey;
+@row-backgrounc-color:#e5e5e5;
+
+.style-trans(@css,@style){
+  -moz-@{css}: @style;
+  -webkit-@{css}: @style;
+  -o-@{css}: @style;
+  @{css}: @style;
+}
+*{
+  box-sizing: border-box;
+}
+.container{
+  width: 80%;
+}
+.show-btn:hover{
+  cursor: pointer;
+}
+.treeHeader{
+  display: inline-flex;
+  vertical-align: top;
+  flex-direction: row;
+  div{
+    border-right: 1px solid @border-color;
+    border-top: 1px solid @border-color;
+    border-bottom: 1px solid @border-color;
+    text-align: center;
+    line-height: 18px;
+    font-size: 18px;
+    padding: 5px;
+  }
+  div:first-child{
+    border-left: 1px solid @border-color;
+  }
+}
+
+.node-1,.node-2,.node-3{
+  display: flex;
+  width: 550px;
+  vertical-align: top;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+ul>li{
+   list-style-type: none;
+  float: left;
+}
+
+.node-item{
+  border-left: 1px solid @border-color;
+  border-right: 1px solid @border-color;
+  .tree1-row,
+  .tree2-row,
+  .tree3-row{
+    width: 550px;
+    display: inline-flex;
+    flex-direction: row;
+    div{
+      width: 100px;
+      border-bottom: 1px solid @border-color;
+      text-align: center;
+      line-height: 18px;
+      padding: 5px 0;
+    }
+    div:first-child{
+      width: 150px;
+      text-align: left;
+    }
+    &:hover{
+      background-color: @row-backgrounc-color;
+    }
+
+  }
+}
+.tree-open:before{
+  content: '+';
+  font-weight: bolder;
+  font-size: 15px;
+  }
+.tree-close:before{
+  content: '-';
+  font-weight: bolder;
+  font-size: 15px;
+
+}
+
+.node-item .tree1-row div:first-child{
+  padding-left: 10px;
+}
+.node-item .tree2-row div:first-child{
+  padding-left: 20px;
+}
+
+.node-item .tree3-row div:first-child{
+  padding-left: 40px;
+}
