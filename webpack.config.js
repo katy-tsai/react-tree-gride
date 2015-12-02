@@ -15,6 +15,7 @@ module.exports = {
   loaders:[
     {test:/\.css$/,loader:'style-loader!css-loader'},
     {test: /\.less$/,loaders: ['style', 'css', 'less']},
+    { test: /\.png$/, loader: "url-loader?mimetype=image/png" },
     {test:/\.js[x]?$/,exclude:/node_modules/,loader:'babel-loader',
     query: {
           optional: ['runtime']

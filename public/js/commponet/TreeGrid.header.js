@@ -6,7 +6,6 @@ var GridHeader = React.createClass({
     var headers = this.props.header;
     var columnWidth = this.props.columnWidth;
     var treeViewWidth = this.props.treeViewWidth;
-    console.log(this.props.width);
     var divStyle ={
       width:this.props.width+'px'
     }
@@ -17,11 +16,7 @@ var GridHeader = React.createClass({
           if(index==0){
             width ={width: treeViewWidth+'px'};
           }
-
           return (<div className={header} key={index} style={width}>{header}</div>)
-
-
-
       })}
       </div>
     );

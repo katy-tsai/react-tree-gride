@@ -49,13 +49,14 @@
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(158);
 	var TreeGrid = __webpack_require__(159);
-	var headers = ['header1', 'header2', 'header3', 'header4', 'header5'];
-	var data = __webpack_require__(162).data;
-	var treeData = __webpack_require__(163);
+	var headers = ['item', 'price', 'num', 'test', 'test2'];
+	var itemName = ['item', 'price', 'num', 'test', 'test2'];
+	var data = __webpack_require__(163).data;
+	var treeData = __webpack_require__(164);
 	var tree = treeData.init(data);
 
-	__webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../css/TreeGrid\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-	ReactDOM.render(React.createElement(TreeGrid, { header: headers, treeViewWidth: 250, tree: tree }), document.getElementById('app'));
+	__webpack_require__(169);
+	ReactDOM.render(React.createElement(TreeGrid, { header: headers, itemName: itemName, treeViewWidth: 250, tree: tree }), document.getElementById('app'));
 
 /***/ },
 /* 1 */
@@ -19657,6 +19658,7 @@
 	  displayName: 'UITreeGrid',
 	  propTypes: {
 	    header: React.PropTypes.array.isRequired,
+	    itemName: React.PropTypes.array.isRequired,
 	    treeViewWidth: React.PropTypes.number,
 	    columnWidth: React.PropTypes.number,
 	    tree: React.PropTypes.object
@@ -19671,12 +19673,14 @@
 	    };
 	  },
 	  init: function init(props) {
-	    var ColumnNum = this.props.header.length;
-	    var width = this.props.treeViewWidth + this.props.columnWidth * (ColumnNum - 1);
+	    var columnNum = this.props.header.length;
+	    var width = this.props.treeViewWidth + this.props.columnWidth * (columnNum - 1);
 
 	    return {
 	      tree: this.props.tree,
 	      header: this.props.header,
+	      columnNum: columnNum,
+	      itemName: this.props.itemName,
 	      treeViewWidth: this.props.treeViewWidth,
 	      columnWidth: this.props.columnWidth,
 	      width: width
@@ -19686,11 +19690,13 @@
 	    var header = this.state.header;
 	    var width = this.state.width;
 	    var tree = this.state.tree;
+	    var columnNum = this.state.columnNum;
+	    var itemName = this.state.itemName;
 	    return React.createElement(
 	      'div',
 	      { className: 'container' },
 	      React.createElement(GridHeader, { header: header, width: width, treeViewWidth: this.props.treeViewWidth, columnWidth: this.props.columnWidth }),
-	      React.createElement(GridBody, { tree: tree, width: width, treeViewWidth: this.props.treeViewWidth, columnWidth: this.props.columnWidth })
+	      React.createElement(GridBody, { itemName: itemName, tree: tree, width: width, treeViewWidth: this.props.treeViewWidth, columnWidth: this.props.columnWidth })
 	    );
 	  }
 	});
@@ -19711,7 +19717,6 @@
 	    var headers = this.props.header;
 	    var columnWidth = this.props.columnWidth;
 	    var treeViewWidth = this.props.treeViewWidth;
-	    console.log(this.props.width);
 	    var divStyle = {
 	      width: this.props.width + 'px'
 	    };
@@ -19723,7 +19728,6 @@
 	        if (index == 0) {
 	          width = { width: treeViewWidth + 'px' };
 	        }
-
 	        return React.createElement(
 	          'div',
 	          { className: header, key: index, style: width },
@@ -19742,52 +19746,155 @@
 	'use strict';
 
 	var React = __webpack_require__(1);
+	var GridRow = __webpack_require__(162);
 	var GridBody = React.createClass({
 	  displayName: 'GridBody',
 
-	  render: function render() {
-	    var tree = this.props.tree;
+	  getInitialState: function getInitialState() {
+	    return { tree: this.props.tree };
+	  },
+
+	  renderRow: function renderRow(root) {
 	    var columnWidth = this.props.columnWidth;
 	    var treeViewWidth = this.props.treeViewWidth;
-	    console.log(this.props.tree);
+	    var itemName = this.props.itemName;
+	    return React.createElement(
+	      'li',
+	      { className: 'node-item', key: 'root' + root.data.id },
+	      React.createElement(GridRow, { node: root, itemName: itemName, treeViewWidth: treeViewWidth, columnWidth: columnWidth, isOpen: this._handleClick.bind(this, root.data.id) }),
+	      this.renderChild(root)
+	    );
+	  },
+	  renderChild: function renderChild(root) {
+	    var divStyle = {
+	      width: this.props.width + 'px'
+	    };
+	    if (root.children.length > 0) {
+	      var nodes = root.children;
+
+	      if (root.isOpen) {
+	        return React.createElement(
+	          'ul',
+	          { className: nodes[0].data.type, style: divStyle },
+	          nodes.map(this.renderRow)
+	        );
+	      }
+	    }
+	  },
+	  render: function render() {
+	    var tree = this.state.tree;
+	    var roots = tree._root.children;
+
 	    var divStyle = {
 	      width: this.props.width + 'px'
 	    };
 	    return React.createElement(
-	      'h1',
-	      null,
-	      'hello body'
+	      'div',
+	      { className: 'treeBody', style: divStyle },
+	      React.createElement(
+	        'ul',
+	        { className: 'root' },
+	        roots.map(this.renderRow)
+	      )
 	    );
+	  },
+	  _handleClick: function _handleClick(id, e) {
+	    e.preventDefault();
+	    var tree = this.state.tree;
+	    var clickNode = null;
+	    var callback = function callback(node) {
+	      if (node.data.id === id) {
+	        clickNode = node;
+	        clickNode.isOpen = !clickNode.isOpen;
+	      }
+	    };
+	    tree.contains(callback, tree.traverseBF);
+	    this.setState({
+	      tree: tree
+	    });
 	  }
 	});
 	module.exports = GridBody;
 
 /***/ },
 /* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+	var GridRow = React.createClass({
+	  displayName: "GridRow",
+
+	  render: function render() {
+	    var data = this.props.node.data;
+	    var isOpen = this.props.node.isOpen;
+	    var itemName = this.props.itemName;
+	    var columnWidth = this.props.columnWidth;
+	    var treeViewWidth = this.props.treeViewWidth;
+	    var rowClass = data.type + "-row";
+	    var iconClass = isOpen ? "show-btn tree-open" : "show-btn tree-close";
+	    var childs = this.props.node.children;
+
+	    var width = { width: columnWidth + 'px' };
+	    return React.createElement(
+	      "div",
+	      { className: rowClass },
+	      itemName.map((function (name, index) {
+	        if (name == 'item') {
+	          var item_width = { width: treeViewWidth + 'px' };
+	          return React.createElement(
+	            "div",
+	            { className: "tree-column", key: index, style: item_width },
+	            React.createElement(
+	              "span",
+	              { className: childs.length > 0 ? iconClass : "show-btn", onClick: this.props.isOpen },
+	              data[name]
+	            )
+	          );
+	        } else {
+	          return React.createElement(
+	            "div",
+	            { className: "tree-column", key: index, style: width },
+	            data[name]
+	          );
+	        }
+	      }).bind(this))
+	    );
+	  }
+	});
+
+	module.exports = GridRow;
+
+/***/ },
+/* 163 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	module.exports = {
-	  data: [{ id: 1, item: 'root', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'Y', order: '1', type: 'root' }, { id: 2, item: 'node1', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'Y', order: '1', type: 'node' }, { id: 3, item: 'node2', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'Y', order: '2', type: 'node' }, { id: 4, item: 'node3', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'N', order: '3', type: 'node' }, { id: 5, item: 'node1-leaf', price: 100, num: 3, test: 300, test2: '111', parent: 2, projectId: 1, hasChild: 'N', order: '1', type: 'leaf' }, { id: 6, item: 'node1-leaf', price: 200, num: 2, test: 400, test2: 'aaa', parent: 2, projectId: 1, hasChild: 'N', order: '2', type: 'leaf' }, { id: 7, item: 'node2-leaf', price: 50, num: 3, test: 150, test2: 'ttt', parent: 3, projectId: 1, hasChild: 'N', order: '1', type: 'leaf' }, { id: 8, item: 'node2-leaf', price: 100, num: 2, test: 200, test2: 'bbb', parent: 3, projectId: 1, hasChild: 'N', order: '2', type: 'leaf' }, { id: 9, item: 'root2', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'N', order: '2', type: 'root' }, { id: 10, item: 'root3', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'N', order: '3', type: 'root' }]
+	  data: [{ id: 1, item: 'root', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'Y', order: '1', type: 'root' }, { id: 2, item: 'node1', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'Y', order: '1', type: 'node' }, { id: 3, item: 'node2', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'Y', order: '2', type: 'node' }, { id: 4, item: 'node3', price: '', num: '', test: '', test2: '', parent: 1, projectId: 1, hasChild: 'N', order: '3', type: 'node' }, { id: 5, item: 'node1-leaf1', price: 100, num: 3, test: 300, test2: '111', parent: 2, projectId: 1, hasChild: 'N', order: '1', type: 'leaf' }, { id: 6, item: 'node1-leaf2', price: 200, num: 2, test: 400, test2: 'aaa', parent: 2, projectId: 1, hasChild: 'N', order: '2', type: 'leaf' }, { id: 7, item: 'node2-leaf1', price: 50, num: 3, test: 150, test2: 'ttt', parent: 3, projectId: 1, hasChild: 'N', order: '1', type: 'leaf' }, { id: 8, item: 'node2-leaf2', price: 100, num: 2, test: 200, test2: 'bbb', parent: 3, projectId: 1, hasChild: 'N', order: '2', type: 'leaf' }, { id: 9, item: 'root2', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'N', order: '2', type: 'root' }, { id: 10, item: 'root3', price: '', num: '', test: '', test2: '', parent: '', projectId: 1, hasChild: 'N', order: '3', type: 'root' }]
 	};
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Tree = __webpack_require__(164);
-	var _ = __webpack_require__(166);
+	var Tree = __webpack_require__(165);
+	var _ = __webpack_require__(167);
 	var tree = new Tree();
+	var i = 1;
+	var data;
 	module.exports = {
 	  init: init
 	};
 	function init(data) {
+	  data = data;
 	  var rootArray = _.sortBy(_.filter(data, { type: 'root' }), 'order');
 	  rootArray.map(function (root) {
-	    tree.add(root, 'project', tree.traverseBF, 'item');
+	    tree.add(root, 'project', tree.traverseDF, 'item');
 	    addChild(root, data);
 	  });
 	  return tree;
@@ -19797,23 +19904,25 @@
 	  var childArray = _.sortBy(_.filter(data, { parent: root.id }), 'order');
 	  if (childArray.length != 0) {
 	    childArray.map(function (child) {
-	      tree.add(child, root.id, tree.traverseBF, 'id');
-	      addChild(child);
+	      tree.add(child, root.id, tree.traverseDF, 'id');
+	      addChild(child, data);
 	    });
 	  }
+	  i++;
 	}
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Queue = __webpack_require__(165);
-	var _ = __webpack_require__(166);
+	var Queue = __webpack_require__(166);
+	var _ = __webpack_require__(167);
 	function Node(data) {
 	  this.data = data;
 	  this.parent = null;
+	  this.isOpen = true;
 	  this.children = [];
 	}
 
@@ -19911,7 +20020,7 @@
 	module.exports = Tree;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports) {
 
 	/*
@@ -19986,7 +20095,7 @@
 	};
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -32341,10 +32450,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(167)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(168)(module), (function() { return this; }())))
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -32356,6 +32465,368 @@
 			module.webpackPolyfill = 1;
 		}
 		return module;
+	}
+
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(170);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(174)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/less-loader/index.js!./TreeGrid.less", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/less-loader/index.js!./TreeGrid.less");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(171)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "* {\n  box-sizing: border-box;\n}\n.container {\n  width: 80%;\n}\n.show-btn:hover {\n  cursor: pointer;\n}\n.treeHeader {\n  display: inline-flex;\n  vertical-align: top;\n  flex-direction: row;\n}\n.treeHeader div {\n  border-right: 1px solid grey;\n  border-top: 1px solid grey;\n  border-bottom: 1px solid grey;\n  text-align: center;\n  line-height: 18px;\n  font-size: 18px;\n  padding: 5px;\n}\n.treeHeader div:first-child {\n  border-left: 1px solid grey;\n}\n.root,\n.node,\n.leaf {\n  display: flex;\n  vertical-align: top;\n  flex-direction: column;\n  margin: 0;\n  padding: 0;\n}\nul > li {\n  list-style-type: none;\n  float: left;\n}\n.treeBody {\n  border-left: 1px solid grey;\n  border-right: 1px solid grey;\n}\n.node-item .root-row,\n.node-item .node-row,\n.node-item .leaf-row {\n  display: inline-flex;\n  flex-direction: row;\n}\n.node-item .root-row div,\n.node-item .node-row div,\n.node-item .leaf-row div {\n  border-bottom: 1px solid grey;\n  text-align: center;\n  line-height: 18px;\n  padding: 5px 0;\n}\n.node-item .root-row div:first-child,\n.node-item .node-row div:first-child,\n.node-item .leaf-row div:first-child {\n  text-align: left;\n}\n.node-item .root-row:hover,\n.node-item .node-row:hover,\n.node-item .leaf-row:hover {\n  background-color: #e5e5e5;\n}\n.show-btn {\n  padding-left: 20px;\n}\n.tree-open {\n  background: url(" + __webpack_require__(172) + ") no-repeat;\n}\n.tree-close {\n  background: url(" + __webpack_require__(173) + ") no-repeat;\n}\n.node-item .root-row div:first-child {\n  padding-left: 10px;\n}\n.node-item .node-row div:first-child {\n  padding-left: 20px;\n}\n.node-item .leaf-row div:first-child {\n  padding-left: 30px;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 171 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 172 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAk0lEQVR4Xu2SQQqDQAxFf8TjCF7ELpR26wXscewF2qWiCz2CPU0XhS66GojBEREy6kJ37UAgn/n/BUKImbHneVK/DvDngtJbAyDayLR8z05OwBBOLuvxqpgGaMDjSgAY8dlqY0bXaKtLyHRSO1AQMeL7Ad4vW9JL2P4t7EBDkDPCwOruqcIKsAiZesB1tf9TPgDQAwsxLnhzK0eQAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 173 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAnUlEQVR4Xt2TTQoCMQyFv/pzttmMCIJLvYAeRy+gR9CliKAL3XgVURRhOuWJlOwECbMQDDwCSfPI19IgiSbRAn5r0OFDhPF8BZQsp8FqklwIJYMhjGZqhGAmPgRTrHLu9QEEBN8G1wvcb/B8QFG870W+DVIEJVDbjjkRutYSbLZoMXEi1DFrt8ee02cQKzgcbRivwZrT+eswwB98phe3fjVVWAH2ngAAAABJRU5ErkJggg=="
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
 	}
 
 

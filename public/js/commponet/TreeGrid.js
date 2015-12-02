@@ -5,6 +5,7 @@ var TreeGrid = React.createClass({
   displayName:'UITreeGrid',
   propTypes:{
     header:React.PropTypes.array.isRequired,
+    itemName:React.PropTypes.array.isRequired,
     treeViewWidth:React.PropTypes.number,
     columnWidth:React.PropTypes.number,
     tree: React.PropTypes.object
@@ -19,12 +20,14 @@ var TreeGrid = React.createClass({
     };
   },
   init(props) {
-    var ColumnNum = this.props.header.length;
-    var width=this.props.treeViewWidth+this.props.columnWidth*(ColumnNum-1);
+    var columnNum = this.props.header.length;
+    var width=this.props.treeViewWidth+this.props.columnWidth*(columnNum-1);
 
     return {
       tree:this.props.tree,
       header:this.props.header,
+      columnNum:columnNum,
+      itemName:this.props.itemName,
       treeViewWidth:this.props.treeViewWidth,
       columnWidth:this.props.columnWidth,
       width:width
@@ -34,10 +37,12 @@ var TreeGrid = React.createClass({
     var header = this.state.header;
     var width = this.state.width;
     var tree = this.state.tree;
+    var columnNum = this.state.columnNum;
+    var itemName = this.state.itemName;
     return (
       <div className="container">
         <GridHeader header={header} width={width} treeViewWidth={this.props.treeViewWidth} columnWidth={this.props.columnWidth}/>
-        <GridBody tree={tree} width={width} treeViewWidth={this.props.treeViewWidth} columnWidth={this.props.columnWidth}/>
+        <GridBody  itemName={itemName} tree={tree} width={width} treeViewWidth={this.props.treeViewWidth} columnWidth={this.props.columnWidth}/>
     </div>
     );
   }

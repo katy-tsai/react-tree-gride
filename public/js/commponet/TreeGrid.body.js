@@ -1,19 +1,66 @@
 const React = require('react');
+const GridRow = require('./TreeGrid.Row');
 var GridBody = React.createClass({
+  getInitialState() {
+    return  {tree:this.props.tree};
+  },
 
-  render(){
-    var tree = this.props.tree;
+  renderRow(root){
     var columnWidth = this.props.columnWidth;
     var treeViewWidth = this.props.treeViewWidth;
-    console.log(this.props.tree);
+    var itemName = this.props.itemName;
+    return (
+         <li className="node-item" key={`root${root.data.id}`} >
+            <GridRow node={root} itemName={itemName} treeViewWidth={treeViewWidth} columnWidth={columnWidth} isOpen={this._handleClick.bind(this,root.data.id)} />
+            {this.renderChild(root)}
+       </li>
+    );
+  },
+  renderChild(root){
+    var divStyle ={
+      width:this.props.width+'px'
+    }
+      if(root.children.length>0){
+        var nodes = root.children;
+
+        if(root.isOpen){
+          return (
+            <ul className={nodes[0].data.type} style={divStyle}>
+              { nodes.map(this.renderRow)}
+            </ul>
+          )
+        }
+      }
+  },
+  render(){
+    var tree = this.state.tree;
+    var roots = tree._root.children;
+
     var divStyle ={
       width:this.props.width+'px'
     }
     return (
-      <h1>
-      hello body
-      </h1>
+        <div className="treeBody"  style={divStyle}>
+           <ul className="root">
+             { roots.map(this.renderRow)}
+           </ul>
+        </div>
     );
+  },
+  _handleClick(id,e){
+     e.preventDefault();
+      var tree = this.state.tree;
+      var clickNode =null;
+      var callback = function(node){
+        if(node.data.id === id){
+          clickNode =node;
+          clickNode.isOpen = (!clickNode.isOpen);
+        }
+      }
+    tree.contains(callback,tree.traverseBF);
+    this.setState({
+			tree:tree
+		});
   }
 });
 module.exports = GridBody;

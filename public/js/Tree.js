@@ -3,6 +3,7 @@ const _ = require('lodash');
 function Node(data){
   this.data = data;
   this.parent = null;
+  this.isOpen = true;
   this.children = [];
 }
 
