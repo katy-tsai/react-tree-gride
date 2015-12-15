@@ -17,6 +17,10 @@ app.get('/form', function (req, res) {
     res.sendFile(path.resolve('./public/form.html'));
 });
 
+app.get('/fileSystem', function (req, res) {
+    res.sendFile(path.resolve('./public/fileSystem.html'));
+});
+
 app.listen(3000);
 console.log("App listening on port 3000")
 module.exports = app;

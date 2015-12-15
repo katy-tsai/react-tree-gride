@@ -1,0 +1,78 @@
+ul>li{
+  list-style-type: none;
+}
+ul{
+  padding: 0;
+}
+
+.fileSystem-container{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.FileTree{
+  width: 20%;
+  max-width: 250px;
+  font-family: Roboto;
+  font-size: 14px;
+  color: #545454;
+  cursor: default;
+  overflow: hidden;
+  border: 0 solid #edf2f1;
+  background-color: #fff;
+  white-space: normal;
+  -webkit-appearance: none;
+  border:  1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 2px #999;
+}
+
+.tree_open_img {
+  background-image: url(data:image/gif;base64,R0lGODlhEgASAJEAAP///4SEhAAAAP///yH5BAUUAAMALAAAAAASABIAAAImnI+py+0Powq01haA3iBgvnlMBnafgKLmWK4LCYpvK0+WJeX6DhUAOw==);
+}
+
+.tree_close_img {
+    background-image: url(data:image/gif;base64,R0lGODlhEgASAJEAAP///4SEhAAAAP///yH5BAUUAAMALAAAAAASABIAAAIqnI+py+0Powq01haA3iDgLWwek2mhNi6ZwLLdZ4owcL4kJ5OWJfX+DykAADs=);
+}
+
+.tree_click {
+  float: left;
+  width: 20px;
+  height: 15px;
+  padding: 2px;
+  cursor: pointer;
+  margin: 0;
+  background-repeat: no-repeat;
+}
+.tree-row{
+  line-height: 20px;
+  padding: 5px;
+}
+
+.searchBar{
+  width: 80%;
+  margin: 10px 10px;
+  background-color: transparent;
+  border: 1px solid #e1e1e1;
+  border-radius: 5px;
+  padding: 10px 20px 10px 20px;
+  outline: none;
+  box-sizing: border-box;
+}
+input:focus~.serachIcon::before{
+  visibility: hidden;
+}
+.serachIcon::before{
+  content: url('../images/search.png');
+  color:#999;
+  font-weight: bold;
+  position: absolute;
+  pointer-events: none;
+  left:20px;
+  top: 28px;
+  visibility: visible;
+}
+.searchDiv{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+}

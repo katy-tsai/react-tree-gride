@@ -2,7 +2,7 @@ const React = require('react');
 const GridHeader = require('./TreeGrid.header');
 const GridBody = require('./TreeGrid.body');
 var TreeGrid = React.createClass({
-  displayName:'UITreeGrid',
+  displayName:'TreeGrid',
   propTypes:{
     header:React.PropTypes.array.isRequired,
     itemName:React.PropTypes.array.isRequired,
