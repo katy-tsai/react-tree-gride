@@ -1,0 +1,115 @@
+*{
+  box-sizing: border-box;
+}
+@mian-color:#1E88E5;
+@input-width:200px;
+@input-font-size :16px;
+.group{
+  position: relative;
+  margin-bottom: 25px;
+  width: @input-width;
+  display: inline-block;
+  margin-right: 10px;
+}
+input{
+  font-size: @input-font-size;
+  padding: 5px 5px 5px 5px;
+  display: block;
+  width: 100%;
+  font-weight: normal;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+.input1{
+  width: 40%;
+}
+.input1:after{
+  content: 'M';
+}
+.input2{
+  width: 40%;
+}
+input:focus{
+  outline: none;
+}
+label{
+  color:#999;
+  font-size: @input-font-size;
+  font-weight: bold;
+  position: absolute;
+  pointer-events: none;
+  left:5px;
+  top: 10px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+.labelError{
+    color: #EF5350;
+}
+input:focus~label,.valueIsNotNull{
+  top:-15px;
+  font-size: 14px;
+  color:@mian-color;
+}
+
+.bar{
+  position: relative;
+  display: block;
+  width: @input-width;
+}
+.bar:before,.bar:after{
+  content:'';
+  height:2px;
+  width:0;
+  bottom: 0px;
+  position: absolute;
+  background: @mian-color;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+input:focus~.errorMsg{
+   visibility: hidden;
+   opacity: 0;
+   text-decoration: none;
+   overflow: visible;
+   margin-top: 50px;
+   display: inline;
+}
+.errorMsg{
+  position: absolute;
+  display: block;
+  color: #EF5350;
+  font-size: 10px;
+   visibility: visible;
+   padding: 5px 20px;
+   opacity: 0.8;
+   z-index: 10;
+   position: absolute;
+   font-family: Arial;
+   font-style: normal;
+   border-radius: 3px;
+   box-shadow: 2px 2px 2px #999;
+
+
+}
+.bar:before{
+  left:50%;
+}
+.bar:after{
+  right: 50%;
+}
+
+input:focus~.bar:before,input:focus~.bar:after{
+  width:50%;
+}
+.highlight{
+  position: absolute;
+  height: 50%;
+  width: 80px;
+  top:25%;
+  left:0;
+  pointer-events: none;
+  opacity: 0.5;
+}

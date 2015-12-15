@@ -1,7 +1,8 @@
 var path = require('path');
 module.exports = {
   entry:{
-    index:'./public/js/index'
+    index:'./public/js/index',
+    form:'./public/js/form'
   },
   output:{
     path:path.join(__dirname,'public/build'),
